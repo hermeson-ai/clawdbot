@@ -1,5 +1,5 @@
 ---
-summary: "Use MiniMax M2.1 in Clawdbot"
+summary: "Use MiniMax M2.1, M2.1 Lightning, and M2 in Clawdbot"
 read_when:
   - You want MiniMax models in Clawdbot
   - You need MiniMax setup guidance
@@ -11,6 +11,20 @@ coding-focused release is **MiniMax M2.1** (December 23, 2025), built for
 real-world complex tasks.
 
 Source: [MiniMax M2.1 release note](https://www.minimax.io/news/minimax-m21)
+
+## Available Models
+
+MiniMax provides three models via Anthropic-compatible API:
+
+- **MiniMax-M2.1**: Latest stable model (December 2025) with improved coding and tool use
+- **MiniMax-M2.1-lightning**: Fast variant with same capabilities, optimized for speed
+- **MiniMax-M2**: Previous generation model
+
+All models support:
+- **Context Window**: 200K tokens
+- **Max Output**: 8,192 tokens
+- **API Format**: Anthropic Messages API (compatible with Claude SDK)
+- **Endpoint**: `https://api.minimaxi.com/anthropic`
 
 ## Model overview (M2.1)
 
@@ -35,9 +49,79 @@ MiniMax highlights these improvements in M2.1:
 
 ## Choose a setup
 
-### MiniMax M2.1 — recommended
+### All MiniMax Models — comprehensive
 
-**Best for:** hosted MiniMax with Anthropic-compatible API.
+**Best for:** Full access to all three MiniMax models with aliases.
+
+Configure via CLI:
+- Run `clawdbot configure`
+- Select **Model/auth**
+- Choose **MiniMax M2.1**
+
+```json5
+{
+  env: { MINIMAX_API_KEY: "sk-..." },
+  agents: {
+    defaults: {
+      model: {
+        primary: "minimax/MiniMax-M2.1",
+        fallbacks: [
+          "minimax/MiniMax-M2.1-lightning",
+          "minimax/MiniMax-M2"
+        ]
+      },
+      models: {
+        "minimax/MiniMax-M2.1": { alias: "M2.1" },
+        "minimax/MiniMax-M2.1-lightning": { alias: "M2.1 Lightning" },
+        "minimax/MiniMax-M2": { alias: "M2" }
+      }
+    }
+  },
+  models: {
+    mode: "merge",
+    providers: {
+      minimax: {
+        baseUrl: "https://api.minimaxi.com/anthropic",
+        apiKey: "${MINIMAX_API_KEY}",
+        api: "anthropic-messages",
+        models: [
+          {
+            id: "MiniMax-M2.1",
+            name: "MiniMax M2.1",
+            reasoning: false,
+            input: ["text"],
+            cost: { input: 15, output: 60, cacheRead: 2, cacheWrite: 10 },
+            contextWindow: 200000,
+            maxTokens: 8192
+          },
+          {
+            id: "MiniMax-M2.1-lightning",
+            name: "MiniMax M2.1 Lightning",
+            reasoning: false,
+            input: ["text"],
+            cost: { input: 15, output: 60, cacheRead: 2, cacheWrite: 10 },
+            contextWindow: 200000,
+            maxTokens: 8192
+          },
+          {
+            id: "MiniMax-M2",
+            name: "MiniMax M2",
+            reasoning: false,
+            input: ["text"],
+            cost: { input: 15, output: 60, cacheRead: 2, cacheWrite: 10 },
+            contextWindow: 200000,
+            maxTokens: 8192
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+### MiniMax M2.1 — simple (single model)
+
+**Best for:** Quick setup with just the latest model.
 
 Configure via CLI:
 - Run `clawdbot configure`

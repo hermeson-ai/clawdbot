@@ -299,6 +299,17 @@
     width: 12px;
     height: 12px;
   }
+
+  /* Language toggle */
+  .language-toggle {
+    --lang-item: 24px;
+    --lang-gap: 2px;
+    --lang-pad: 3px;
+  }
+
+  .language-toggle__button {
+    font-size: 9px;
+  }
 }
 
 /* Small mobile */
@@ -370,5 +381,15 @@
   .theme-icon {
     width: 11px;
     height: 11px;
+  }
+
+  .language-toggle {
+    --lang-item: 22px;
+    --lang-gap: 2px;
+    --lang-pad: 2px;
+  }
+
+  .language-toggle__button {
+    font-size: 8px;
   }
 }

@@ -43,7 +43,7 @@ See [Venice AI](/providers/venice).
 - [Amazon Bedrock](/bedrock)
 - [Z.AI](/providers/zai)
 - [GLM models](/providers/glm)
-- [MiniMax](/providers/minimax)
+- [MiniMax](/providers/minimax) - Core provider setup and M2.1, M2.1-lightning, M2 models ([Complete Guide](/providers/minimax-models-guide))
 - [Venius (Venice AI, privacy-focused)](/providers/venice)
 - [Ollama (local models)](/providers/ollama)
 

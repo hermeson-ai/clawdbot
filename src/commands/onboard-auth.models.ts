@@ -1,8 +1,8 @@
 import type { ModelDefinitionConfig } from "../config/types.js";
 
-export const DEFAULT_MINIMAX_BASE_URL = "https://api.minimax.io/v1";
-export const MINIMAX_API_BASE_URL = "https://api.minimax.io/anthropic";
-export const MINIMAX_HOSTED_MODEL_ID = "MiniMax-M2.1";
+export const DEFAULT_MINIMAX_BASE_URL = "https://api.minimaxi.com/v1";
+export const MINIMAX_API_BASE_URL = "https://api.minimaxi.com/anthropic";
+export const MINIMAX_HOSTED_MODEL_ID = "MiniMax-M1";
 export const MINIMAX_HOSTED_MODEL_REF = `minimax/${MINIMAX_HOSTED_MODEL_ID}`;
 export const DEFAULT_MINIMAX_CONTEXT_WINDOW = 200000;
 export const DEFAULT_MINIMAX_MAX_TOKENS = 8192;
@@ -53,10 +53,35 @@ export const KIMI_CODE_DEFAULT_COST = {
 };
 
 const MINIMAX_MODEL_CATALOG = {
-  "MiniMax-M2.1": { name: "MiniMax M2.1", reasoning: false },
+  "MiniMax-M1": {
+    name: "MiniMax M1",
+    reasoning: false,
+    contextWindow: 200000,
+    maxTokens: 8192,
+  },
+  "MiniMax-M2": {
+    name: "MiniMax M2",
+    reasoning: false,
+    contextWindow: 200000,
+    maxTokens: 8192,
+  },
+  "MiniMax-M2.1": {
+    name: "MiniMax M2.1",
+    reasoning: false,
+    contextWindow: 200000,
+    maxTokens: 8192,
+  },
   "MiniMax-M2.1-lightning": {
     name: "MiniMax M2.1 Lightning",
     reasoning: false,
+    contextWindow: 200000,
+    maxTokens: 8192,
+  },
+  "M2-her": {
+    name: "MiniMax M2 Her",
+    reasoning: false,
+    contextWindow: 200000,
+    maxTokens: 8192,
   },
 } as const;
 
@@ -83,12 +108,24 @@ export function buildMinimaxModelDefinition(params: {
 }
 
 export function buildMinimaxApiModelDefinition(modelId: string): ModelDefinitionConfig {
+  const catalog = MINIMAX_MODEL_CATALOG[modelId as MinimaxCatalogId];
   return buildMinimaxModelDefinition({
     id: modelId,
     cost: MINIMAX_API_COST,
-    contextWindow: DEFAULT_MINIMAX_CONTEXT_WINDOW,
-    maxTokens: DEFAULT_MINIMAX_MAX_TOKENS,
+    contextWindow: catalog?.contextWindow ?? DEFAULT_MINIMAX_CONTEXT_WINDOW,
+    maxTokens: catalog?.maxTokens ?? DEFAULT_MINIMAX_MAX_TOKENS,
   });
+}
+
+// Helper to build all MiniMax models
+export function buildAllMinimaxApiModels(): ModelDefinitionConfig[] {
+  return [
+    buildMinimaxApiModelDefinition("MiniMax-M1"),
+    buildMinimaxApiModelDefinition("MiniMax-M2"),
+    buildMinimaxApiModelDefinition("MiniMax-M2.1"),
+    buildMinimaxApiModelDefinition("MiniMax-M2.1-lightning"),
+    buildMinimaxApiModelDefinition("M2-her"),
+  ];
 }
 
 export function buildMoonshotModelDefinition(): ModelDefinitionConfig {

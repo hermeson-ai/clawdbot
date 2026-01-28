@@ -1,0 +1,301 @@
+// Complete MiniMax Configuration Example
+// Copy this to ~/.clawdbot/clawdbot.json and customize
+{
+  // ============================================================================
+  // Environment Variables
+  // ============================================================================
+  env: {
+    // Get your API key from https://platform.minimax.io
+    MINIMAX_API_KEY: "sk-your-minimax-key-here",
+
+    // Optional: Add other providers for fallback
+    // ANTHROPIC_API_KEY: "sk-ant-your-key-here",
+    // OPENAI_API_KEY: "sk-your-openai-key-here"
+  },
+
+  // ============================================================================
+  // Agent Configuration
+  // ============================================================================
+  agents: {
+    defaults: {
+      // Workspace directory for agent files
+      workspace: "~/clawd",
+
+      // ========================================================================
+      // Model Selection Strategy
+      // ========================================================================
+      model: {
+        // Primary model - used first for all requests
+        primary: "minimax/MiniMax-M2.1",
+
+        // Fallback chain - tried in order if primary fails
+        fallbacks: [
+          "minimax/MiniMax-M2.1-lightning",  // Faster variant
+          "minimax/MiniMax-M2"                // Previous generation (stable)
+        ]
+      },
+
+      // ========================================================================
+      // Model Aliases - Quick switching with /model <alias>
+      // ========================================================================
+      models: {
+        // MiniMax models
+        "minimax/MiniMax-M2.1": {
+          alias: "M2.1",
+          // Optional: model-specific config
+          // temperature: 0.7,
+          // maxTokens: 8192
+        },
+        "minimax/MiniMax-M2.1-lightning": {
+          alias: "Lightning",
+          // Recommended for faster, shorter responses
+        },
+        "minimax/MiniMax-M2": {
+          alias: "M2",
+          // Previous generation, stable
+        },
+
+        // Optional: Add other providers
+        // "anthropic/claude-opus-4-5": { alias: "Opus" },
+        // "openai/gpt-5.2": { alias: "GPT5" }
+      }
+    }
+  },
+
+  // ============================================================================
+  // Models Provider Configuration
+  // ============================================================================
+  models: {
+    // "merge" - combine with built-in models
+    // "replace" - use only models defined here
+    mode: "merge",
+
+    providers: {
+      // ========================================================================
+      // MiniMax Provider
+      // ========================================================================
+      minimax: {
+        // API endpoint (Anthropic-compatible)
+        baseUrl: "https://api.minimaxi.com/anthropic",
+
+        // API key (uses env var)
+        apiKey: "${MINIMAX_API_KEY}",
+
+        // API format
+        api: "anthropic-messages",
+
+        // Model definitions
+        models: [
+          // --------------------------------------------------------------------
+          // MiniMax M2.1 - Latest model (Dec 2025)
+          // --------------------------------------------------------------------
+          {
+            id: "MiniMax-M2.1",
+            name: "MiniMax M2.1",
+
+            // Model capabilities
+            reasoning: false,        // Not a reasoning model
+            input: ["text"],         // Supports text only (no images)
+
+            // Pricing (CNY per 1M tokens)
+            // Update these values based on your plan
+            cost: {
+              input: 15,       // Input tokens
+              output: 60,      // Output tokens
+              cacheRead: 2,    // Cache read tokens
+              cacheWrite: 10   // Cache write tokens
+            },
+
+            // Limits
+            contextWindow: 200000,   // 200K context
+            maxTokens: 8192          // Max output tokens
+          },
+
+          // --------------------------------------------------------------------
+          // MiniMax M2.1 Lightning - Fast variant
+          // --------------------------------------------------------------------
+          {
+            id: "MiniMax-M2.1-lightning",
+            name: "MiniMax M2.1 Lightning",
+
+            reasoning: false,
+            input: ["text"],
+
+            // Lightning may have different pricing
+            cost: {
+              input: 15,
+              output: 60,
+              cacheRead: 2,
+              cacheWrite: 10
+            },
+
+            contextWindow: 200000,
+            maxTokens: 8192,
+
+            // Optional: model-specific parameters
+            // temperature: 0.5  // Lower for more consistent responses
+          },
+
+          // --------------------------------------------------------------------
+          // MiniMax M2 - Previous generation
+          // --------------------------------------------------------------------
+          {
+            id: "MiniMax-M2",
+            name: "MiniMax M2",
+
+            reasoning: false,
+            input: ["text"],
+
+            // M2 pricing (may differ from M2.1)
+            cost: {
+              input: 15,
+              output: 60,
+              cacheRead: 2,
+              cacheWrite: 10
+            },
+
+            contextWindow: 200000,
+            maxTokens: 8192
+          }
+        ]
+      }
+
+      // ========================================================================
+      // Optional: Add other providers for multi-provider setup
+      // ========================================================================
+
+      // Anthropic (Claude)
+      /*
+      anthropic: {
+        apiKey: "${ANTHROPIC_API_KEY}"
+      }
+      */
+
+      // OpenAI
+      /*
+      openai: {
+        apiKey: "${OPENAI_API_KEY}"
+      }
+      */
+    }
+  },
+
+  // ============================================================================
+  // Gateway Configuration (Optional)
+  // ============================================================================
+  gateway: {
+    port: 18789,
+    bind: "loopback"  // or "all" for remote access
+  },
+
+  // ============================================================================
+  // Channel Configuration (Optional)
+  // ============================================================================
+  channels: {
+    // WhatsApp
+    whatsapp: {
+      allowFrom: [
+        // Add your number here
+        // "+1234567890"
+      ]
+    },
+
+    // Telegram
+    telegram: {
+      // Set your bot token
+      // botToken: "123456:ABC-DEF...",
+      allowFrom: [
+        // Add your Telegram username
+        // "@yourusername"
+      ]
+    }
+  }
+}
+
+// ============================================================================
+// Usage Examples
+// ============================================================================
+
+/*
+
+1. Switch models in chat:
+   /model                              # Show model picker
+   /model M2.1                         # Use alias
+   /model minimax/MiniMax-M2.1-lightning  # Use full ID
+
+2. Via CLI:
+   clawdbot models set minimax/MiniMax-M2.1
+   clawdbot models list
+   clawdbot models status
+
+3. Test a model:
+   clawdbot agent --model minimax/MiniMax-M2.1 --message "Hello!"
+
+4. Check usage:
+   /usage full
+
+5. Model status:
+   /status
+
+*/
+
+// ============================================================================
+// Configuration Scenarios
+// ============================================================================
+
+/*
+
+SCENARIO 1: Speed Priority
+- Primary: MiniMax-M2.1-lightning
+- Fallback: MiniMax-M2.1
+Use when: Interactive chat, quick responses needed
+
+SCENARIO 2: Quality Priority
+- Primary: MiniMax-M2.1
+- Fallback: MiniMax-M2.1-lightning
+Use when: Code generation, complex reasoning
+
+SCENARIO 3: Cost Optimization
+- Primary: MiniMax-M2
+- Fallback: MiniMax-M2.1-lightning
+Use when: Budget-conscious, high volume
+
+SCENARIO 4: Multi-Provider
+- Primary: anthropic/claude-opus-4-5
+- Fallback: minimax/MiniMax-M2.1
+Use when: Best quality + cost-effective fallback
+
+*/
+
+// ============================================================================
+// Troubleshooting
+// ============================================================================
+
+/*
+
+Problem: "Unknown model: minimax/MiniMax-M2.1"
+Solution: Check that models.providers.minimax is configured
+
+Problem: "Authentication failed"
+Solution: Verify MINIMAX_API_KEY is set correctly
+
+Problem: Model not in /model list
+Solution: Restart gateway with: clawdbot gateway restart
+
+Problem: Case sensitivity error
+Solution: Use exact IDs: MiniMax-M2.1 (not minimax-m2.1)
+
+*/
+
+// ============================================================================
+// Links
+// ============================================================================
+
+/*
+
+MiniMax Platform: https://platform.minimax.io
+API Documentation: https://platform.minimaxi.com/docs/api-reference/text-anthropic-api
+Clawdbot Docs: https://docs.clawd.bot
+MiniMax Guide: https://docs.clawd.bot/providers/minimax-models-guide
+
+*/

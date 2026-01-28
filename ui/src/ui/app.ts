@@ -7,6 +7,7 @@ import { loadSettings, type UiSettings } from "./storage";
 import { renderApp } from "./app-render";
 import type { Tab } from "./navigation";
 import type { ResolvedTheme, ThemeMode } from "./theme";
+import { initLanguage } from "./i18n.js";
 import type {
   AgentsListResult,
   ConfigSnapshot,
@@ -272,6 +273,8 @@ export class ClawdbotApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    // 初始化语言设置
+    initLanguage();
     handleConnected(this as unknown as Parameters<typeof handleConnected>[0]);
   }
 

@@ -8,6 +8,7 @@ import { loadChatHistory } from "./controllers/chat";
 import { syncUrlWithSessionKey } from "./app-settings";
 import type { SessionsListResult } from "./types";
 import type { ThemeMode } from "./theme";
+import { getCurrentLanguage, setLanguage, getSupportedLanguages, t, type Language } from "./i18n.js";
 import type { ThemeTransitionContext } from "./theme-transition";
 
 export function renderTab(state: AppViewState, tab: Tab) {
@@ -171,14 +172,14 @@ export function renderThemeToggle(state: AppViewState) {
 
   return html`
     <div class="theme-toggle" style="--theme-index: ${index};">
-      <div class="theme-toggle__track" role="group" aria-label="Theme">
+      <div class="theme-toggle__track" role="group" aria-label="${t('ui.language')}">
         <span class="theme-toggle__indicator"></span>
         <button
           class="theme-toggle__button ${state.theme === "system" ? "active" : ""}"
           @click=${applyTheme("system")}
           aria-pressed=${state.theme === "system"}
-          aria-label="System theme"
-          title="System"
+          aria-label="${t('ui.systemMode')}"
+          title="${t('ui.systemMode')}"
         >
           ${renderMonitorIcon()}
         </button>
@@ -186,8 +187,8 @@ export function renderThemeToggle(state: AppViewState) {
           class="theme-toggle__button ${state.theme === "light" ? "active" : ""}"
           @click=${applyTheme("light")}
           aria-pressed=${state.theme === "light"}
-          aria-label="Light theme"
-          title="Light"
+          aria-label="${t('ui.lightMode')}"
+          title="${t('ui.lightMode')}"
         >
           ${renderSunIcon()}
         </button>
@@ -195,10 +196,47 @@ export function renderThemeToggle(state: AppViewState) {
           class="theme-toggle__button ${state.theme === "dark" ? "active" : ""}"
           @click=${applyTheme("dark")}
           aria-pressed=${state.theme === "dark"}
-          aria-label="Dark theme"
-          title="Dark"
+          aria-label="${t('ui.darkMode')}"
+          title="${t('ui.darkMode')}"
         >
           ${renderMoonIcon()}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// 语言切换组件
+export function renderLanguageToggle() {
+  const currentLang = getCurrentLanguage();
+  
+  const applyLanguage = (lang: Language) => (event: MouseEvent) => {
+    event.preventDefault();
+    setLanguage(lang);
+    // 触发重新渲染
+    window.location.reload();
+  };
+
+  return html`
+    <div class="language-toggle">
+      <div class="language-toggle__track" role="group" aria-label="Language">
+        <button
+          class="language-toggle__button ${currentLang === 'en' ? "active" : ""}"
+          @click=${applyLanguage('en')}
+          aria-pressed=${currentLang === 'en'}
+          aria-label="English"
+          title="English"
+        >
+          EN
+        </button>
+        <button
+          class="language-toggle__button ${currentLang === 'zh' ? "active" : ""}"
+          @click=${applyLanguage('zh')}
+          aria-pressed=${currentLang === 'zh'}
+          aria-label="中文"
+          title="中文"
+        >
+          中
         </button>
       </div>
     </div>
